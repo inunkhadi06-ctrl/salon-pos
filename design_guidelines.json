@@ -1,0 +1,83 @@
+{
+  "theme": "Dark and Light Mode (Elegant, Black, White, Gold)",
+  "archetype": "5 (Luxury)",
+  "color_palette": {
+    "light": {
+      "background": "#FAFAFA",
+      "surface": "#FFFFFF",
+      "primary": "#C5A059",
+      "primary_foreground": "#FFFFFF",
+      "secondary": "#1A1A1A",
+      "secondary_foreground": "#FFFFFF",
+      "text": "#0A0A0A",
+      "text_muted": "#4B4B52",
+      "border": "#E5E5E5"
+    },
+    "dark": {
+      "background": "#0A0A0B",
+      "surface": "#121214",
+      "primary": "#D4AF37",
+      "primary_foreground": "#000000",
+      "secondary": "#2A2A2A",
+      "secondary_foreground": "#FFFFFF",
+      "text": "#FFFFFF",
+      "text_muted": "#A1A1A8",
+      "border": "#27272A"
+    }
+  },
+  "typography": {
+    "heading_font": "Outfit",
+    "body_font": "Manrope",
+    "rules": [
+      "Use Outfit for dashboard titles, KPI metric numbers, and main section headers. Use tight letter spacing (tracking-tight).",
+      "Use Manrope for tables, forms, sidebar navigation, and body text. Use regular letter spacing.",
+      "Never use Inter for headings."
+    ]
+  },
+  "spacing_and_layout": {
+    "general": "Generous spacing. Use p-6 or p-8 for cards and main container paddings.",
+    "dashboard_grid": "Grid columns: 1 on mobile, 2 on tablet, 4 on desktop for KPIs. Use the 'Control Room' dense bento grid strategy for the dashboard.",
+    "sidebar": "Collapsible sidebar. Fixed width on desktop, hidden on mobile with hamburger menu. Sidebar should have a dark, sleek appearance in dark mode and clean white in light mode."
+  },
+  "components": {
+    "card": "Solid surface with 1px subtle border. No heavy drop shadows in dark mode. Soft shadow-sm in light mode.",
+    "button": "Primary buttons use the gold accent color. Hover state must be a lighter hue. Focus rings should use the gold color.",
+    "table": "Manrope font. Clean lines. Search and filter inputs above every table. Include pagination.",
+    "forms": "Use Shadcn forms. Inputs should have subtle borders and gold focus rings.",
+    "modal": "Modern modals with backdrop-blur for forms (POS, Add Customer, Add Service).",
+    "toast": "Use Sonner for toast notifications. Clean, minimal, and elegant.",
+    "empty_state": "Design distinct empty states for tables/lists without data. Use a muted icon and prompt to 'Add New'.",
+    "loading_state": "Use skeleton loaders for tables and charts instead of full-page spinners."
+  },
+  "media": {
+    "logo": {
+      "url": "https://static.prod-images.emergentagent.com/jobs/97d7c5c9-1c54-4247-a592-954b0b75281b/images/7e5d433156e378c311ab2f7bd4b1a3d9a06484c2e842faf060962dab26ab8e89.png",
+      "description": "Minimalist gold monogram logo for Mulya Salon. Use in sidebar header."
+    },
+    "login_background": {
+      "url": "https://static.prod-images.emergentagent.com/jobs/97d7c5c9-1c54-4247-a592-954b0b75281b/images/655e466502e54202a19f50c4b55f8e8f4c641ca5ebc0f205adfd7931df13a913.png",
+      "description": "Cinematic luxury salon interior for the login/auth page background."
+    },
+    "placeholder_portraits": [
+      "https://images.unsplash.com/photo-1715407754988-4d617cdf0a4e?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2ODh8MHwxfHNlYXJjaHwzfHxwcm9mZXNzaW9uYWwlMjBoYWlyc3R5bGlzdCUyMHBvcnRyYWl0fGVufDB8fHx8MTc4MDMyMTc2Nnww&ixlib=rb-4.1.0&q=85",
+      "https://images.unsplash.com/photo-1609436132311-e4b0c9370469?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2ODh8MHwxfHNlYXJjaHwyfHxwcm9mZXNzaW9uYWwlMjBoYWlyc3R5bGlzdCUyMHBvcnRyYWl0fGVufDB8fHx8MTc4MDMyMTc2Nnww&ixlib=rb-4.1.0&q=85"
+    ],
+    "placeholder_tools": [
+      "https://images.unsplash.com/photo-1527799820374-dcf8d9d4a388?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA1OTN8MHwxfHNlYXJjaHwzfHxlbGVnYW50JTIwaGFpciUyMHNhbG9uJTIwdG9vbHN8ZW58MHx8fHwxNzgwMzIxNzY2fDA&ixlib=rb-4.1.0&q=85",
+      "https://images.unsplash.com/photo-1559599101-f09722fb4948?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA1OTN8MHwxfHNlYXJjaHw0fHxlbGVnYW50JTIwaGFpciUyMHNhbG9uJTIwdG9vbHN8ZW58MHx8fHwxNzgwMzIxNzY2fDA&ixlib=rb-4.1.0&q=85"
+    ]
+  },
+  "instructions_to_main_agent": [
+    "Install and use `lucide-react` for icons.",
+    "Initialize Tailwind CSS with the provided color palette mapping to CSS variables for theming (light/dark mode).",
+    "Configure Tailwind with `Outfit` and `Manrope` fonts.",
+    "Implement a persistent layout with a Sidebar Navigation containing all requested menus (Dashboard, Kasir, Booking, Pelanggan, Stylist, Layanan, Produk, Inventori, Laporan, Pengaturan).",
+    "Implement the Dashboard view with a top row of 4 KPI cards: Total Transactions, Total Bookings, Total Customers, Total Revenue.",
+    "Include a Revenue Chart using Recharts in the Dashboard.",
+    "Include 'Recent Bookings' and 'Recent Transactions' tables in the Dashboard.",
+    "Implement Dark Mode toggle in the top navigation bar.",
+    "Ensure all interactive and key informational elements have `data-testid` attributes (e.g., data-testid='sidebar-dashboard-link').",
+    "Use Shadcn UI components (Card, Table, Dialog, Input, Button, DropdownMenu) and customize them to fit the luxury theme.",
+    "Ensure mobile responsiveness: Sidebar collapses to a hamburger menu, and grids adjust to single columns."
+  ]
+}

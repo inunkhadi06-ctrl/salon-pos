@@ -1,0 +1,63 @@
+.App {
+  min-height: 100vh;
+}
+
+.App-header {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+}
+
+.App-link {
+  color: hsl(var(--primary));
+}
+
+.sidebar-nav-link {
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.sidebar-nav-link:hover {
+  background-color: hsl(var(--accent) / 0.1);
+}
+
+.sidebar-nav-link.active {
+  background-color: hsl(var(--primary));
+  color: hsl(var(--primary-foreground));
+}
+
+/* Print styles untuk struk */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  .print-area,
+  .print-area * {
+    visibility: visible;
+  }
+  .print-area {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 80mm;
+  }
+}
+
+/* Skeleton loader animation */
+@keyframes skeleton-loading {
+  0% {
+    background-color: hsl(var(--muted) / 0.1);
+  }
+  50% {
+    background-color: hsl(var(--muted) / 0.2);
+  }
+  100% {
+    background-color: hsl(var(--muted) / 0.1);
+  }
+}
+
+.skeleton {
+  animation: skeleton-loading 1.5s ease-in-out infinite;
+}
