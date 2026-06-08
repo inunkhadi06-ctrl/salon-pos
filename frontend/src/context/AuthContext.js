@@ -3,8 +3,18 @@ import axios from 'axios';
 
 const AuthContext = createContext();
 
-const BACKEND_URL = "http://127.0.0.1:8000";
-const API = `${BACKEND_URL}/api`;
+import API from "../lib/api";
+import axios from "axios";
+
+const login = async (data) => {
+  try {
+    const res = await axios.post(`${API}/api/auth/login`, data);
+    return res.data;
+  } catch (err) {
+    console.log(err);
+    throw err;
+  }
+};
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
@@ -12,12 +22,13 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (token) {
-      fetchUser();
-    } else {
-      setLoading(false);
-    }
-  }, [token]);
+  if (token) {
+    fetchUser();
+  } else {
+    setLoading(false);
+  }
+// eslint-disable-next-line react-hooks/exhaustive-deps
+}, [token]);
 
   const fetchUser = async () => {
     try {

@@ -1,68 +1,119 @@
-import axios from 'axios';
+import axios from "axios";
 
-const BACKEND_URL = "http://127.0.0.1:8000";
-const API = `${BACKEND_URL}/api`;
+const BASE_URL = process.env.REACT_APP_API_URL;
 
 const getAuthHeader = () => {
-  const token = localStorage.getItem('token');
+  const token = localStorage.getItem("token");
   return token ? { Authorization: `Bearer ${token}` } : {};
 };
 
 export const api = {
+  // Auth
+  login: (data) => axios.post(`${BASE_URL}/auth/login`, data),
+
   // Dashboard
-  getDashboardStats: () => axios.get(`${API}/dashboard/stats`, { headers: getAuthHeader() }),
-  getRevenueChart: () => axios.get(`${API}/dashboard/revenue-chart`, { headers: getAuthHeader() }),
-  getRecentBookings: () => axios.get(`${API}/dashboard/recent-bookings`, { headers: getAuthHeader() }),
-  getRecentTransactions: () => axios.get(`${API}/dashboard/recent-transactions`, { headers: getAuthHeader() }),
+  getDashboardStats: () =>
+    axios.get(`${BASE_URL}/api/dashboard/stats`, { headers: getAuthHeader() }),
+
+  getRevenueChart: () =>
+    axios.get(`${BASE_URL}/api/dashboard/revenue-chart`, { headers: getAuthHeader() }),
+
+  getRecentBookings: () =>
+    axios.get(`${BASE_URL}/api/dashboard/recent-bookings`, { headers: getAuthHeader() }),
+
+  getRecentTransactions: () =>
+    axios.get(`${BASE_URL}/api/dashboard/recent-transactions`, { headers: getAuthHeader() }),
 
   // Customers
-  getCustomers: () => axios.get(`${API}/customers`, { headers: getAuthHeader() }),
-  createCustomer: (data) => axios.post(`${API}/customers`, data, { headers: getAuthHeader() }),
-  updateCustomer: (id, data) => axios.put(`${API}/customers/${id}`, data, { headers: getAuthHeader() }),
-  deleteCustomer: (id) => axios.delete(`${API}/customers/${id}`, { headers: getAuthHeader() }),
+  getCustomers: () =>
+    axios.get(`${BASE_URL}/api/customers`, { headers: getAuthHeader() }),
+
+  createCustomer: (data) =>
+    axios.post(`${BASE_URL}/api/customers`, data, { headers: getAuthHeader() }),
+
+  updateCustomer: (id, data) =>
+    axios.put(`${BASE_URL}/api/customers/${id}`, data, { headers: getAuthHeader() }),
+
+  deleteCustomer: (id) =>
+    axios.delete(`${BASE_URL}/api/customers/${id}`, { headers: getAuthHeader() }),
 
   // Services
-  getServices: () => axios.get(`${API}/services`, { headers: getAuthHeader() }),
-  createService: (data) => axios.post(`${API}/services`, data, { headers: getAuthHeader() }),
-  updateService: (id, data) => axios.put(`${API}/services/${id}`, data, { headers: getAuthHeader() }),
-  deleteService: (id) => axios.delete(`${API}/services/${id}`, { headers: getAuthHeader() }),
+  getServices: () =>
+    axios.get(`${BASE_URL}/api/services`, { headers: getAuthHeader() }),
+
+  createService: (data) =>
+    axios.post(`${BASE_URL}/api/services`, data, { headers: getAuthHeader() }),
+
+  updateService: (id, data) =>
+    axios.put(`${BASE_URL}/api/services/${id}`, data, { headers: getAuthHeader() }),
+
+  deleteService: (id) =>
+    axios.delete(`${BASE_URL}/api/services/${id}`, { headers: getAuthHeader() }),
 
   // Products
-  getProducts: () => axios.get(`${API}/products`, { headers: getAuthHeader() }),
-  createProduct: (data) => axios.post(`${API}/products`, data, { headers: getAuthHeader() }),
-  updateProduct: (id, data) => axios.put(`${API}/products/${id}`, data, { headers: getAuthHeader() }),
-  deleteProduct: (id) => axios.delete(`${API}/products/${id}`, { headers: getAuthHeader() }),
+  getProducts: () =>
+    axios.get(`${BASE_URL}/api/products`, { headers: getAuthHeader() }),
+
+  createProduct: (data) =>
+    axios.post(`${BASE_URL}/api/products`, data, { headers: getAuthHeader() }),
+
+  updateProduct: (id, data) =>
+    axios.put(`${BASE_URL}/api/products/${id}`, data, { headers: getAuthHeader() }),
+
+  deleteProduct: (id) =>
+    axios.delete(`${BASE_URL}/api/products/${id}`, { headers: getAuthHeader() }),
 
   // Stylists
-  getStylists: () => axios.get(`${API}/stylists`, { headers: getAuthHeader() }),
-  createStylist: (data) => axios.post(`${API}/stylists`, data, { headers: getAuthHeader() }),
-  updateStylist: (id, data) => axios.put(`${API}/stylists/${id}`, data, { headers: getAuthHeader() }),
-  deleteStylist: (id) => axios.delete(`${API}/stylists/${id}`, { headers: getAuthHeader() }),
+  getStylists: () =>
+    axios.get(`${BASE_URL}/api/stylists`, { headers: getAuthHeader() }),
+
+  createStylist: (data) =>
+    axios.post(`${BASE_URL}/api/stylists`, data, { headers: getAuthHeader() }),
+
+  updateStylist: (id, data) =>
+    axios.put(`${BASE_URL}/api/stylists/${id}`, data, { headers: getAuthHeader() }),
+
+  deleteStylist: (id) =>
+    axios.delete(`${BASE_URL}/api/stylists/${id}`, { headers: getAuthHeader() }),
 
   // Bookings
-  getBookings: () => axios.get(`${API}/bookings`, { headers: getAuthHeader() }),
-  createBooking: (data) => axios.post(`${API}/bookings`, data, { headers: getAuthHeader() }),
-  updateBooking: (id, data) => axios.put(`${API}/bookings/${id}`, data, { headers: getAuthHeader() }),
-  deleteBooking: (id) => axios.delete(`${API}/bookings/${id}`, { headers: getAuthHeader() }),
+  getBookings: () =>
+    axios.get(`${BASE_URL}/api/bookings`, { headers: getAuthHeader() }),
+
+  createBooking: (data) =>
+    axios.post(`${BASE_URL}/api/bookings`, data, { headers: getAuthHeader() }),
+
+  updateBooking: (id, data) =>
+    axios.put(`${BASE_URL}/api/bookings/${id}`, data, { headers: getAuthHeader() }),
+
+  deleteBooking: (id) =>
+    axios.delete(`${BASE_URL}/api/bookings/${id}`, { headers: getAuthHeader() }),
 
   // Transactions
-  getTransactions: () => axios.get(`${API}/transactions`, { headers: getAuthHeader() }),
-  createTransaction: (data) => axios.post(`${API}/transactions`, data, { headers: getAuthHeader() }),
+  getTransactions: () =>
+    axios.get(`${BASE_URL}/api/transactions`, { headers: getAuthHeader() }),
+
+  createTransaction: (data) =>
+    axios.post(`${BASE_URL}/api/transactions`, data, { headers: getAuthHeader() }),
 
   // Settings
-  getSettings: () => axios.get(`${API}/settings`, { headers: getAuthHeader() }),
-  updateSettings: (data) => axios.put(`${API}/settings`, data, { headers: getAuthHeader() }),
+  getSettings: () =>
+    axios.get(`${BASE_URL}/api/settings`, { headers: getAuthHeader() }),
+
+  updateSettings: (data) =>
+    axios.put(`${BASE_URL}/api/settings`, data, { headers: getAuthHeader() }),
 
   // Reports
-  getTransactionReport: (startDate, endDate) => 
-    axios.get(`${API}/reports/transactions`, {
+  getTransactionReport: (startDate, endDate) =>
+    axios.get(`${BASE_URL}/api/reports/transactions`, {
       params: { start_date: startDate, end_date: endDate },
-      headers: getAuthHeader()
+      headers: getAuthHeader(),
     }),
-  getStylistCommissionReport: (startDate, endDate) => 
-    axios.get(`${API}/reports/stylist-commission`, {
+
+  getStylistCommissionReport: (startDate, endDate) =>
+    axios.get(`${BASE_URL}/api/reports/stylist-commission`, {
       params: { start_date: startDate, end_date: endDate },
-      headers: getAuthHeader()
+      headers: getAuthHeader(),
     }),
 };
 
