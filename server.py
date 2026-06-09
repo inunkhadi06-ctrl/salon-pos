@@ -34,7 +34,7 @@ ALGORITHM = "HS256"
 security = HTTPBearer()
 
 # >>> FIX 1: router harus ada dulu
-api_router = APIRouter()
+api_router = APIRouter(prefix="/api")
 
 # >>> FIX 2: single app only (pakai lifespan)
 from contextlib import asynccontextmanager
