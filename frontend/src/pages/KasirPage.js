@@ -175,12 +175,7 @@ const KasirPage = () => {
   };
 
   const printReceipt = () => {
-  const printContent = document.querySelector('.print-area');
-  const originalBody = document.body.innerHTML;
-  document.body.innerHTML = printContent.innerHTML;
   window.print();
-  document.body.innerHTML = originalBody;
-  window.location.reload();
 };
 
   return (
