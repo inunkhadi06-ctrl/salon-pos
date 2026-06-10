@@ -175,8 +175,13 @@ const KasirPage = () => {
   };
 
   const printReceipt = () => {
-    window.print();
-  };
+  const printContent = document.querySelector('.print-area');
+  const originalBody = document.body.innerHTML;
+  document.body.innerHTML = printContent.innerHTML;
+  window.print();
+  document.body.innerHTML = originalBody;
+  window.location.reload();
+};
 
   return (
     <div className="space-y-6" data-testid="kasir-page">
