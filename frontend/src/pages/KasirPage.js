@@ -175,7 +175,23 @@ const KasirPage = () => {
   };
 
   const printReceipt = () => {
-  window.print();
+  const printContent = document.querySelector('.print-area').innerHTML;
+  const printWindow = window.open('', '_blank', 'width=300,height=600');
+  printWindow.document.write(`
+    <html>
+      <head>
+        <style>
+          body { font-family: monospace; font-size: 12px; width: 80mm; margin: 0; padding: 5mm; }
+          * { box-sizing: border-box; }
+        </style>
+      </head>
+      <body>${printContent}</body>
+    </html>
+  `);
+  printWindow.document.close();
+  printWindow.focus();
+  printWindow.print();
+  printWindow.close();
 };
 
   return (
