@@ -12,6 +12,9 @@ export const api = {
   login: (data) =>
   axios.post(`${BASE_URL}/api/auth/login`, data),
 
+  getMe: () =>
+    axios.get(`${BASE_URL}/api/auth/me`, { headers: getAuthHeader() }),
+
   // Dashboard
   getDashboardStats: () =>
     axios.get(`${BASE_URL}/api/dashboard/stats`, { headers: getAuthHeader() }),
