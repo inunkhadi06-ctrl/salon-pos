@@ -28,23 +28,6 @@
   color: hsl(var(--primary-foreground));
 }
 
-/* Print styles untuk struk */
-@media print {
-  body * {
-    visibility: hidden;
-  }
-  .print-area,
-  .print-area * {
-    visibility: visible;
-  }
-  .print-area {
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 80mm;
-  }
-}
-
 /* Skeleton loader animation */
 @keyframes skeleton-loading {
   0% {
@@ -80,5 +63,9 @@
     width: 80mm;
     font-size: 12px;
     font-family: monospace;
+  }
+  html, body {
+    height: auto !important;
+    overflow: hidden !important;
   }
 }
