@@ -26,6 +26,8 @@ const KasirPage = () => {
   const [loading, setLoading] = useState(false);
   const [showReceipt, setShowReceipt] = useState(false);
   const [lastTransaction, setLastTransaction] = useState(null);
+  const [serviceSearch, setServiceSearch] = useState('');
+  const [serviceFilter, setServiceFilter] = useState('Semua');
 
   useEffect(() => {
     fetchData();
@@ -274,35 +276,69 @@ const KasirPage = () => {
 
           {/* Services */}
           <Card data-testid="services-card">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Sparkles className="h-5 w-5" />
-                2. Pilih Layanan
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              {services.length === 0 ? (
-                <p className="text-center text-muted-foreground py-4">Belum ada layanan</p>
-              ) : (
-                <div className="grid gap-3 sm:grid-cols-2">
-                  {services.map(service => (
-                    <button
-                      key={service.id}
-                      onClick={() => addServiceToCart(service)}
-                      className="p-4 border border-border rounded-lg hover:bg-accent hover:border-primary transition text-left"
-                      data-testid={`service-item-${service.id}`}
-                    >
-                      <p className="font-medium">{service.name}</p>
-                      <p className="text-sm text-muted-foreground">{service.category}</p>
-                      <p className="text-sm font-semibold text-primary mt-2">
-                        {formatCurrency(service.price)}
-                      </p>
-                    </button>
-                  ))}
-                </div>
-              )}
-            </CardContent>
-          </Card>
+  <CardHeader>
+    <CardTitle className="flex items-center gap-2">
+      <Sparkles className="h-5 w-5" />
+      2. Pilih Layanan
+    </CardTitle>
+  </CardHeader>
+  <CardContent className="space-y-3">
+    <Input
+      placeholder="Cari layanan..."
+      value={serviceSearch}
+      onChange={(e) => setServiceSearch(e.target.value)}
+      data-testid="service-search"
+    />
+    <div className="flex gap-2">
+      {['Semua', 'Pria', 'Salon'].map(f => (
+        <button
+          key={f}
+          onClick={() => setServiceFilter(f)}
+          className={`px-3 py-1 rounded-full text-sm border transition
+            ${serviceFilter === f
+              ? 'bg-primary text-primary-foreground border-primary'
+              : 'border-border text-muted-foreground hover:bg-accent'
+            }`}
+        >
+          {f}
+        </button>
+      ))}
+    </div>
+
+    {(() => {
+      const filtered = services.filter(s => {
+        const matchSearch = s.name.toLowerCase().includes(serviceSearch.toLowerCase());
+        const matchFilter = serviceFilter === 'Semua' || s.category?.toUpperCase() === serviceFilter.toUpperCase();
+        return matchSearch && matchFilter;
+      });
+
+      if (services.length === 0) return (
+        <p className="text-center text-muted-foreground py-4">Belum ada layanan</p>
+      );
+      if (filtered.length === 0) return (
+        <p className="text-center text-muted-foreground py-4">Layanan tidak ditemukan</p>
+      );
+      return (
+        <div className="grid gap-3 sm:grid-cols-2">
+          {filtered.map(service => (
+            <button
+              key={service.id}
+              onClick={() => addServiceToCart(service)}
+              className="p-4 border border-border rounded-lg hover:bg-accent hover:border-primary transition text-left"
+              data-testid={`service-item-${service.id}`}
+            >
+              <p className="font-medium">{service.name}</p>
+              <p className="text-sm text-muted-foreground">{service.category}</p>
+              <p className="text-sm font-semibold text-primary mt-2">
+                {formatCurrency(service.price)}
+              </p>
+            </button>
+          ))}
+        </div>
+      );
+    })()}
+  </CardContent>
+</Card>
 
           {/* Products */}
           <Card data-testid="products-card">
