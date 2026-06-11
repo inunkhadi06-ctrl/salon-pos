@@ -319,7 +319,7 @@ const KasirPage = () => {
       data-testid="service-search"
     />
     <div className="flex gap-2">
-      {['Semua', 'Pria', 'Salon'].map(f => (
+      {['Semua', 'Barbershop', 'Salon', 'Paket'].map(f => (
         <button
           key={f}
           onClick={() => setServiceFilter(f)}
