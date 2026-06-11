@@ -26,6 +26,9 @@ const KasirPage = () => {
   const [loading, setLoading] = useState(false);
   const [showReceipt, setShowReceipt] = useState(false);
   const [lastTransaction, setLastTransaction] = useState(null);
+  const [newCustomerDialog, setNewCustomerDialog] = useState(false);
+  const [newCustomerForm, setNewCustomerForm] = useState({ name: '', phone: '', birth_date: '' });
+  const [savingCustomer, setSavingCustomer] = useState(false);
   const [serviceSearch, setServiceSearch] = useState('');
   const [serviceFilter, setServiceFilter] = useState('Semua');
 
@@ -195,6 +198,27 @@ const KasirPage = () => {
   printWindow.print();
   printWindow.close();
 };
+  const handleCreateCustomer = async () => {
+  if (!newCustomerForm.name || !newCustomerForm.phone) {
+    toast.error('Nama dan nomor HP wajib diisi');
+    return;
+  }
+  setSavingCustomer(true);
+  try {
+    const response = await api.createCustomer(newCustomerForm);
+    const created = response.data;
+    await fetchData();
+    setSelectedCustomer(created);
+    setNewCustomerDialog(false);
+    setNewCustomerForm({ name: '', phone: '', birth_date: '' });
+    toast.success(`Pelanggan ${created.name} berhasil ditambahkan`);
+  } catch (error) {
+    toast.error('Gagal menyimpan pelanggan');
+  } finally {
+    setSavingCustomer(false);
+  }
+};
+
 
   return (
     <div className="space-y-6" data-testid="kasir-page">
@@ -214,33 +238,38 @@ const KasirPage = () => {
             <CardContent className="grid sm:grid-cols-2 gap-4">
               <div>
                 <Label className="flex items-center gap-2 mb-2">
-                  <User className="h-4 w-4" />
-                  Pelanggan <span className="text-destructive">*</span>
-                </Label>
-                <Select 
-                  value={selectedCustomer?.id || ''} 
-                  onValueChange={(value) => {
-                    const customer = customers.find(c => c.id === value);
-                    setSelectedCustomer(customer);
-                  }}
-                >
-                  <SelectTrigger data-testid="customer-select">
-                    <SelectValue placeholder="Pilih pelanggan..." />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {customers.map(customer => (
-                      <SelectItem key={customer.id} value={customer.id}>
-                        {customer.name} - {customer.phone}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                {selectedCustomer && (
-                  <p className="text-xs text-muted-foreground mt-2">
-                    Poin: {selectedCustomer.loyalty_points} | Kunjungan: {selectedCustomer.visit_count}x
-                  </p>
-                )}
-              </div>
+                <User className="h-4 w-4" />
+                Pelanggan <span className="text-destructive">*</span>
+  </Label>
+  <div className="flex gap-2">
+    <Select 
+      value={selectedCustomer?.id || ''} 
+      onValueChange={(value) => {
+        const customer = customers.find(c => c.id === value);
+        setSelectedCustomer(customer);
+      }}
+    >
+      <SelectTrigger data-testid="customer-select">
+        <SelectValue placeholder="Pilih pelanggan..." />
+      </SelectTrigger>
+      <SelectContent>
+        {customers.map(customer => (
+          <SelectItem key={customer.id} value={customer.id}>
+            {customer.name} - {customer.phone}
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
+    <Button variant="outline" size="icon" onClick={() => setNewCustomerDialog(true)}>
+      <Plus className="h-4 w-4" />
+    </Button>
+  </div>
+  {selectedCustomer && (
+    <p className="text-xs text-muted-foreground mt-2">
+      Poin: {selectedCustomer.loyalty_points} | Kunjungan: {selectedCustomer.visit_count}x
+    </p>
+  )}
+</div>
 
               <div>
                 <Label className="flex items-center gap-2 mb-2">
@@ -659,6 +688,52 @@ const KasirPage = () => {
           </div>
         </DialogContent>
       </Dialog>
+
+              {/* Dialog Tambah Pelanggan Baru */}
+<Dialog open={newCustomerDialog} onOpenChange={setNewCustomerDialog}>
+  <DialogContent>
+    <DialogHeader>
+      <DialogTitle>Tambah Pelanggan Baru</DialogTitle>
+    </DialogHeader>
+    <div className="space-y-4">
+      <div>
+        <Label>Nama</Label>
+        <Input
+          value={newCustomerForm.name}
+          onChange={(e) => setNewCustomerForm({ ...newCustomerForm, name: e.target.value })}
+          placeholder="Nama pelanggan..."
+          required
+        />
+      </div>
+      <div>
+        <Label>Nomor HP</Label>
+        <Input
+          value={newCustomerForm.phone}
+          onChange={(e) => setNewCustomerForm({ ...newCustomerForm, phone: e.target.value })}
+          placeholder="08xx..."
+          required
+        />
+      </div>
+      <div>
+        <Label>Tanggal Lahir</Label>
+        <Input
+          type="date"
+          value={newCustomerForm.birth_date}
+          onChange={(e) => setNewCustomerForm({ ...newCustomerForm, birth_date: e.target.value })}
+        />
+      </div>
+      <div className="flex gap-2">
+        <Button onClick={handleCreateCustomer} disabled={savingCustomer} className="flex-1">
+          {savingCustomer ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Plus className="mr-2 h-4 w-4" />}
+          Simpan
+        </Button>
+        <Button variant="outline" onClick={() => setNewCustomerDialog(false)} className="flex-1">
+          Batal
+        </Button>
+      </div>
+    </div>
+  </DialogContent>
+</Dialog>
     </div>
   );
 };
