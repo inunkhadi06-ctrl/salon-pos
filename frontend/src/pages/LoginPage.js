@@ -44,7 +44,7 @@ const LoginPage = () => {
       </div>
 
       <div className="relative z-10 w-full max-w-md px-6">
-        <div className="bg-card/95 backdrop-blur-md rounded-lg shadow-2xl border border-border p-8">
+        <div className="bg-card/75 backdrop-blur-md rounded-lg shadow-2xl border border-border p-8">
           <div className="flex flex-col items-center mb-8">
             <img 
               src="logobaru.jpeg"
