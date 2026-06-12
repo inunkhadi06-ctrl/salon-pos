@@ -181,22 +181,55 @@ const KasirPage = () => {
 
   const printReceipt = () => {
   const printContent = document.querySelector('.print-area').innerHTML;
-  const printWindow = window.open('', '_blank', 'width=300,height=600');
-  printWindow.document.write(`
+  
+  const printFrame = document.createElement('iframe');
+  printFrame.style.display = 'none';
+  document.body.appendChild(printFrame);
+  
+  printFrame.contentDocument.write(`
     <html>
       <head>
         <style>
-          body { font-family: monospace; font-size: 12px; width: 80mm; margin: 0; padding: 5mm; }
-          * { box-sizing: border-box; }
+          @page {
+            size: 58mm auto;
+            margin: 0;
+          }
+          * { box-sizing: border-box; margin: 0; padding: 0; }
+          body { font-family: monospace; font-size: 11px; width: 58mm; padding: 3mm; }
+          .flex { display: flex; }
+          .justify-between { justify-content: space-between; }
+          .text-center { text-align: center; }
+          .font-bold { font-weight: bold; }
+          .font-semibold { font-weight: 600; }
+          .text-base { font-size: 13px; }
+          .text-xl { font-size: 16px; }
+          .text-xs { font-size: 10px; }
+          .border-b { border-bottom: 1px dashed #000; }
+          .border-t { border-top: 1px dashed #000; }
+          .pb-3 { padding-bottom: 6px; }
+          .pt-3 { padding-top: 6px; }
+          .pt-1 { padding-top: 3px; }
+          .mb-2 { margin-bottom: 4px; }
+          .mt-1 { margin-top: 4px; }
+          .space-y-1 > * + * { margin-top: 2px; }
+          .space-y-3 > * + * { margin-top: 6px; }
+          .text-red-500 { color: #000; }
+          .text-muted-foreground { color: #555; }
+          .uppercase { text-transform: uppercase; }
+          .border-dashed { border-style: dashed; }
         </style>
       </head>
       <body>${printContent}</body>
     </html>
   `);
-  printWindow.document.close();
-  printWindow.focus();
-  printWindow.print();
-  printWindow.close();
+  printFrame.contentDocument.close();
+  
+  printFrame.contentWindow.focus();
+  printFrame.contentWindow.print();
+  
+  setTimeout(() => {
+    document.body.removeChild(printFrame);
+  }, 1000);
 };
   const handleCreateCustomer = async () => {
   if (!newCustomerForm.name || !newCustomerForm.phone) {
