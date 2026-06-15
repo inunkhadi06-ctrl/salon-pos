@@ -180,56 +180,87 @@ const KasirPage = () => {
   };
 
   const printReceipt = () => {
-  const printContent = document.querySelector('.print-area').innerHTML;
-  
-  const printFrame = document.createElement('iframe');
-  printFrame.style.display = 'none';
-  document.body.appendChild(printFrame);
-  
-  printFrame.contentDocument.write(`
-    <html>
-      <head>
-        <style>
-          @page {
-            size: 58mm auto;
-            margin: 0;
-          }
-          * { box-sizing: border-box; margin: 0; padding: 0; }
-          body { font-family: monospace; font-size: 11px; width: 58mm; padding: 3mm; }
-          .flex { display: flex; }
-          .justify-between { justify-content: space-between; }
-          .text-center { text-align: center; }
-          .font-bold { font-weight: bold; }
-          .font-semibold { font-weight: 600; }
-          .text-base { font-size: 13px; }
-          .text-xl { font-size: 16px; }
-          .text-xs { font-size: 10px; }
-          .border-b { border-bottom: 1px dashed #000; }
-          .border-t { border-top: 1px dashed #000; }
-          .pb-3 { padding-bottom: 6px; }
-          .pt-3 { padding-top: 6px; }
-          .pt-1 { padding-top: 3px; }
-          .mb-2 { margin-bottom: 4px; }
-          .mt-1 { margin-top: 4px; }
-          .space-y-1 > * + * { margin-top: 2px; }
-          .space-y-3 > * + * { margin-top: 6px; }
-          .text-red-500 { color: #000; }
-          .text-muted-foreground { color: #555; }
-          .uppercase { text-transform: uppercase; }
-          .border-dashed { border-style: dashed; }
-        </style>
-      </head>
-      <body>${printContent}</body>
-    </html>
-  `);
-  printFrame.contentDocument.close();
-  
-  printFrame.contentWindow.focus();
-  printFrame.contentWindow.print();
-  
-  setTimeout(() => {
-    document.body.removeChild(printFrame);
-  }, 1000);
+  if (!lastTransaction) return;
+
+  const ESC = '\x1b';
+  const GS = '\x1d';
+  let cmds = '';
+
+  // Init printer
+  cmds += ESC + '@';
+
+  // Center align
+  const center = ESC + 'a' + '\x01';
+  const left = ESC + 'a' + '\x00';
+  const boldOn = ESC + 'E' + '\x01';
+  const boldOff = ESC + 'E' + '\x00';
+
+  const line = '--------------------------------';
+  const dline = '================================';
+
+  // Helper: pad left/right text to fit 32 chars (58mm paper)
+  const row = (left_, right_) => {
+    const maxLen = 32;
+    const space = maxLen - left_.length - right_.length;
+    return left_ + ' '.repeat(Math.max(1, space)) + right_ + '\n';
+  };
+
+  // Header
+  cmds += center + boldOn + 'MULYA SALON\n' + boldOff;
+  cmds += 'Sistem POS Salon & Barbershop\n';
+  cmds += left + line + '\n';
+
+  // Info
+  cmds += `Invoice : ${lastTransaction.invoice_number}\n`;
+  cmds += `Tanggal : ${formatDateTime(lastTransaction.created_at)}\n`;
+  cmds += `Pelanggan: ${lastTransaction.customer_name}\n`;
+  cmds += `Stylist : ${lastTransaction.stylist_name}\n`;
+  cmds += `Kasir   : ${lastTransaction.served_by}\n`;
+  cmds += line + '\n';
+
+  // Items
+  cmds += boldOn + 'DETAIL ITEM:\n' + boldOff;
+  lastTransaction.items.forEach(item => {
+    const name = item.name + (item.quantity > 1 ? ` x${item.quantity}` : '');
+    const price = formatCurrency(item.price * item.quantity);
+    cmds += row(name.substring(0, 20), price);
+  });
+  cmds += line + '\n';
+
+  // Totals
+  cmds += row('Subtotal', formatCurrency(lastTransaction.subtotal));
+  if (lastTransaction.discount > 0) {
+    cmds += row('Diskon', '-' + formatCurrency(lastTransaction.discount));
+  }
+  cmds += dline + '\n';
+  cmds += boldOn + row('TOTAL', formatCurrency(lastTransaction.total)) + boldOff;
+  cmds += line + '\n';
+
+  // Payment
+  cmds += row('Metode Bayar', lastTransaction.payment_method.toUpperCase());
+  if (lastTransaction.payment_method === 'tunai') {
+    cmds += row('Dibayar', formatCurrency(lastTransaction.cash_paid));
+    cmds += boldOn + row('Kembalian', formatCurrency(lastTransaction.change_amount)) + boldOff;
+  }
+  cmds += '\n';
+
+  // Footer
+  cmds += center + 'Terima kasih telah berkunjung.\n';
+  cmds += 'Sampai jumpa kembali!\n';
+  cmds += '\n\n\n';
+
+  // Cut paper
+  cmds += GS + 'V' + '\x42' + '\x00';
+
+  // Convert to base64
+  const bytes = [];
+  for (let i = 0; i < cmds.length; i++) {
+    bytes.push(cmds.charCodeAt(i) & 0xff);
+  }
+  const base64 = btoa(String.fromCharCode(...bytes));
+
+  // Send to RawBT
+  window.location.href = `rawbt:base64,${base64}`;
 };
   const handleCreateCustomer = async () => {
   if (!newCustomerForm.name || !newCustomerForm.phone) {
