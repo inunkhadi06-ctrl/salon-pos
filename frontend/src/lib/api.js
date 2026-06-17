@@ -119,6 +119,27 @@ export const api = {
       params: { start_date: startDate, end_date: endDate },
       headers: getAuthHeader(),
     }),
+
+
+  // Cash Expenses (Kas Kasir)
+  getCashExpenses: (date) =>
+    axios.get(`${BASE_URL}/api/cash-expenses`, {
+      params: { date },
+      headers: getAuthHeader(),
+    }),
+
+  createCashExpense: (data) =>
+    axios.post(`${BASE_URL}/api/cash-expenses`, data, { headers: getAuthHeader() }),
+
+  deleteCashExpense: (id) =>
+    axios.delete(`${BASE_URL}/api/cash-expenses/${id}`, { headers: getAuthHeader() }),
+
+  getCashExpenseReport: (startDate, endDate) =>
+    axios.get(`${BASE_URL}/api/reports/cash-expenses`, {
+      params: { start_date: startDate, end_date: endDate },
+      headers: getAuthHeader(),
+    }),
+
 };
 
 export default api;

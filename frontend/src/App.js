@@ -16,6 +16,7 @@ import ReportsPage from '@/pages/ReportsPage';
 import SettingsPage from '@/pages/SettingsPage';
 import { Loader2 } from 'lucide-react';
 import '@/App.css';
+import CashExpensePage from '@/pages/CashExpensePage';
 
 const ProtectedRoute = ({ children }) => {
   const { user, loading } = useAuth();
@@ -56,6 +57,7 @@ const AppRoutes = () => {
         <Route index element={<Navigate to="/dashboard" replace />} />
         <Route path="dashboard" element={<DashboardPage />} />
         <Route path="kasir" element={<KasirPage />} />
+        <Route path="kas-kasir" element={<CashExpensePage />} />
         <Route path="customers" element={<CustomersPage />} />
         <Route path="services" element={<ServicesPage />} />
         <Route path="products" element={<ProductsPage />} />

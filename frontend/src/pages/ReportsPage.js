@@ -32,18 +32,22 @@ const ReportsPage = () => {
 
   const loadReport = async (start, end) => {
     setLoading(true);
+
     try {
-      const [transactionRes, commissionRes] = await Promise.all([
-        api.getTransactionReport(start, end),
-        api.getStylistCommissionReport(start, end)
-      ]);
+      const transactionRes = await api.getTransactionReport(start, end);
       setReportData(transactionRes.data);
+    } catch (error) {
+      console.error('Error loading transaction report:', error);
+    }
+
+    try {
+      const commissionRes = await api.getStylistCommissionReport(start, end);
       setCommissionData(commissionRes.data);
     } catch (error) {
-      // silent on initial load
-    } finally {
-      setLoading(false);
+      console.error('Error loading commission report:', error);
     }
+
+    setLoading(false);
   };
 
   const handleGenerateReport = async () => {

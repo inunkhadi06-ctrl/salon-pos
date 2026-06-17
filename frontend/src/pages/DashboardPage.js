@@ -103,16 +103,22 @@ const DashboardPage = () => {
 
         <Card data-testid="kpi-revenue-month">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Pendapatan Bulan Ini</CardTitle>
+            <CardTitle className="text-sm font-medium">
+             {isOwner ? 'Pendapatan Bulan Ini' : 'Pendapatan Hari Ini'}
+             </CardTitle>
             <DollarSign className="h-4 w-4 text-primary" />
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-heading font-bold tracking-tight">
-              {formatCurrency(stats?.total_revenue_month || 0)}
+              {formatCurrency(
+                    isOwner
+                    ? stats?.total_revenue_month
+                    : stats?.total_revenue_today || 0
+               )}
             </div>
             <p className="text-xs text-muted-foreground mt-1 flex items-center gap-1">
               <TrendingUp className="h-3 w-3" />
-              Revenue bulan berjalan
+              {isOwner ? 'Revenue bulan berjalan' : 'Revenue hari ini'}
             </p>
           </CardContent>
         </Card>

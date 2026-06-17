@@ -18,13 +18,15 @@ import {
   Menu,
   X,
   Moon,
-  Sun
+  Sun,
+  Wallet
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const menuItems = [
   { path: '/dashboard', label: 'Dashboard', icon: LayoutDashboard, roles: ['owner', 'admin', 'kasir', 'stylist'] },
   { path: '/kasir', label: 'Kasir', icon: ShoppingCart, roles: ['owner', 'admin', 'kasir'] },
+  { path: '/kas-kasir', label: 'Kas Kasir', icon: Wallet, roles: ['owner', 'admin', 'kasir'] },
   { path: '/booking', label: 'Booking', icon: Calendar, roles: ['owner', 'admin', 'kasir'] },
   { path: '/customers', label: 'Pelanggan', icon: Users, roles: ['owner', 'admin', 'kasir'] },
   { path: '/stylists', label: 'Stylist', icon: Scissors, roles: ['owner', 'admin'] },
