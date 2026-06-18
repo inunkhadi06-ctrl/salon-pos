@@ -9,6 +9,7 @@ import { useAuth } from '@/context/AuthContext';
 
 const DashboardPage = () => {
   const { user } = useAuth();
+
   const [stats, setStats] = useState(null);
   const [chartData, setChartData] = useState([]);
   const [recentBookings, setRecentBookings] = useState([]);
@@ -31,9 +32,9 @@ const DashboardPage = () => {
       ]);
 
       setStats(statsRes.data);
-      setChartData(chartRes.data);
-      setRecentBookings(bookingsRes.data);
-      setRecentTransactions(transactionsRes.data);
+      setChartData(Array.isArray(chartRes.data) ? chartRes.data : []);
+      setRecentBookings(Array.isArray(bookingsRes.data) ? bookingsRes.data : []);
+      setRecentTransactions(Array.isArray(transactionsRes.data) ? transactionsRes.data : []);
     } catch (error) {
       console.error('Error fetching dashboard data:', error);
     } finally {
