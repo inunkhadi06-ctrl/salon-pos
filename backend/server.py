@@ -169,6 +169,23 @@ class Settings(BaseModel):
     close_time: str = "21:00"
     tax_rate: float = 10.0
 
+class CashExpense(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    amount: float
+    description: str
+    category: Optional[str] = None
+    date: str  # YYYY-MM-DD (Jakarta)
+    created_by_id: Optional[str] = None
+    created_by: Optional[str] = None
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class CashExpenseCreate(BaseModel):
+    amount: float
+    description: str
+    category: Optional[str] = None
+    date: Optional[str] = None  # default today (Jakarta)
+
 # ================= AUTH HELPERS =================
 def hash_password(password: str) -> str:
     return bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
@@ -611,6 +628,112 @@ async def get_transaction_report(
             "average_transaction": (
                 summary["total_revenue"] / summary["count"] if summary["count"] > 0 else 0
             ),
+        },
+    }
+
+# ================= CASH EXPENSES (KAS KASIR) =================
+@api_router.get("/cash-expenses", response_model=List[CashExpense])
+async def get_cash_expenses(
+    date: Optional[str] = None,
+    current_user: dict = Depends(get_current_user),
+):
+    """Return cash expenses for a specific Jakarta date (default: today)."""
+    target_date = date or jakarta_today_iso()
+    expenses = (
+        await db.cash_expenses.find({"date": target_date}, {"_id": 0})
+        .sort("created_at", -1)
+        .to_list(1000)
+    )
+    for e in expenses:
+        if isinstance(e.get("created_at"), str):
+            e["created_at"] = datetime.fromisoformat(e["created_at"])
+    return expenses
+
+@api_router.post("/cash-expenses", response_model=CashExpense)
+async def create_cash_expense(
+    payload: CashExpenseCreate,
+    current_user: dict = Depends(get_current_user),
+):
+    if payload.amount is None or payload.amount <= 0:
+        raise HTTPException(status_code=400, detail="Nominal harus lebih dari 0")
+    if not payload.description or not payload.description.strip():
+        raise HTTPException(status_code=400, detail="Keterangan tidak boleh kosong")
+
+    # Resolve user info for audit
+    user_doc = await db.users.find_one(
+        {"id": current_user.get("user_id")}, {"_id": 0, "password": 0}
+    )
+    creator_name = user_doc.get("name") if user_doc else current_user.get("email")
+
+    expense = CashExpense(
+        amount=float(payload.amount),
+        description=payload.description.strip(),
+        category=(payload.category or "").strip() or None,
+        date=payload.date or jakarta_today_iso(),
+        created_by_id=current_user.get("user_id"),
+        created_by=creator_name,
+    )
+    doc = expense.model_dump()
+    doc["created_at"] = doc["created_at"].isoformat()
+    await db.cash_expenses.insert_one(doc)
+    return expense
+
+@api_router.delete("/cash-expenses/{expense_id}")
+async def delete_cash_expense(
+    expense_id: str, current_user: dict = Depends(get_current_user)
+):
+    result = await db.cash_expenses.delete_one({"id": expense_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Pengeluaran tidak ditemukan")
+    return {"message": "Cash expense deleted"}
+
+@api_router.get("/reports/cash-expenses")
+async def get_cash_expense_report(
+    start_date: Optional[str] = None,
+    end_date: Optional[str] = None,
+    current_user: dict = Depends(get_current_user),
+):
+    """Cash expense report with optional date range (Jakarta dates, inclusive)."""
+    query: dict = {}
+    if start_date and end_date:
+        query["date"] = {"$gte": start_date, "$lte": end_date}
+    elif start_date:
+        query["date"] = {"$gte": start_date}
+    elif end_date:
+        query["date"] = {"$lte": end_date}
+
+    expenses = (
+        await db.cash_expenses.find(query, {"_id": 0})
+        .sort("date", -1)
+        .to_list(10000)
+    )
+
+    # Revenue from transactions in the same range (for net cash).
+    # Support partial ranges by defaulting the missing bound.
+    revenue_query: dict = {}
+    if start_date or end_date:
+        rng = parse_date_range_utc_iso(
+            start_date or "1970-01-01",
+            end_date or jakarta_today_iso(),
+        )
+        if rng:
+            revenue_query = {"created_at": {"$gte": rng[0], "$lte": rng[1]}}
+    revenue_summary = (
+        await _aggregate_transaction_summary(revenue_query)
+        if revenue_query
+        else {"count": 0, "total_revenue": 0.0, "total_commission": 0.0}
+    )
+
+    total_expense = sum(e.get("amount", 0) or 0 for e in expenses)
+    total_revenue = revenue_summary["total_revenue"]
+
+    return {
+        "expenses": expenses,
+        "summary": {
+            "total_expense": total_expense,
+            "total_count": len(expenses),
+            "total_revenue": total_revenue,
+            "net_cash": total_revenue - total_expense,
         },
     }
 
