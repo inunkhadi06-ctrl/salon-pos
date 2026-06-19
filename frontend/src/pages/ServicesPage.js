@@ -15,6 +15,7 @@ const ServicesPage = () => {
   const [services, setServices] = useState([]);
   const [filteredServices, setFilteredServices] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
+  const [categoryFilter, setCategoryFilter] = useState('Semua');
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingService, setEditingService] = useState(null);
   const [formData, setFormData] = useState({
@@ -33,12 +34,15 @@ const ServicesPage = () => {
   }, []);
 
   useEffect(() => {
-    const filtered = services.filter(s => 
-      s.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      s.category.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-    setFilteredServices(filtered);
-  }, [searchTerm, services]);
+  const filtered = services.filter(s => {
+    const matchSearch = s.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      s.category.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchCategory = categoryFilter === 'Semua' || 
+      s.category?.toLowerCase() === categoryFilter.toLowerCase();
+    return matchSearch && matchCategory;
+  });
+  setFilteredServices(filtered);
+}, [searchTerm, categoryFilter, services]);
 
   const fetchServices = async () => {
     try {
@@ -271,6 +275,21 @@ const ServicesPage = () => {
               data-testid="search-service-input"
             />
           </div>
+          <div className="flex gap-2 mt-3 flex-wrap">
+  {['Semua', ...new Set(services.map(s => s.category).filter(Boolean))].map(f => (
+    <button
+      key={f}
+      onClick={() => setCategoryFilter(f)}
+      className={`px-3 py-1 rounded-full text-sm border transition
+        ${categoryFilter === f
+          ? 'bg-primary text-primary-foreground border-primary'
+          : 'border-border text-muted-foreground hover:bg-accent'
+        }`}
+    >
+      {f}
+    </button>
+  ))}
+</div>
         </CardHeader>
         <CardContent>
           <Table>
