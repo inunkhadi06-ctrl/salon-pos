@@ -21,7 +21,10 @@ const ServicesPage = () => {
     name: '',
     category: '',
     duration: 0,
+    priceType: 'fixed',
     price: 0,
+    minPrice: 0,
+    maxPrice: 0,
     description: ''
   });
 
@@ -47,14 +50,29 @@ const ServicesPage = () => {
     }
   };
 
+  const buildServicePayload = () => {
+    const isVariable = formData.priceType === 'variable';
+    return {
+      name: formData.name,
+      category: formData.category,
+      duration: formData.duration,
+      description: formData.description,
+      price_type: formData.priceType,
+      price: isVariable ? 0 : formData.price,
+      min_price: isVariable ? formData.minPrice : null,
+      max_price: isVariable ? formData.maxPrice : null,
+    };
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const payload = buildServicePayload();
     try {
       if (editingService) {
-        await api.updateService(editingService.id, { ...editingService, ...formData });
+        await api.updateService(editingService.id, { ...editingService, ...payload });
         toast.success('Layanan berhasil diupdate');
       } else {
-        await api.createService(formData);
+        await api.createService(payload);
         toast.success('Layanan berhasil ditambahkan');
       }
       fetchServices();
@@ -81,7 +99,10 @@ const ServicesPage = () => {
       name: service.name,
       category: service.category,
       duration: service.duration,
-      price: service.price,
+      priceType: service.price_type || 'fixed',
+      price: service.price || 0,
+      minPrice: service.min_price || 0,
+      maxPrice: service.max_price || 0,
       description: service.description || ''
     });
     setDialogOpen(true);
@@ -90,7 +111,16 @@ const ServicesPage = () => {
   const handleCloseDialog = () => {
     setDialogOpen(false);
     setEditingService(null);
-    setFormData({ name: '', category: '', duration: 0, price: 0, description: '' });
+    setFormData({
+      name: '',
+      category: '',
+      duration: 0,
+      priceType: 'fixed',
+      price: 0,
+      minPrice: 0,
+      maxPrice: 0,
+      description: ''
+    });
   };
 
   return (
@@ -145,16 +175,67 @@ const ServicesPage = () => {
                 />
               </div>
               <div>
-                <Label htmlFor="price">Harga</Label>
-                <Input
-                  id="price"
-                  type="number"
-                  value={formData.price}
-                  onChange={(e) => setFormData({ ...formData, price: Number(e.target.value) })}
-                  required
-                  data-testid="service-price-input"
-                />
+                <Label>Tipe Harga</Label>
+                <div className="flex gap-2 mt-2">
+                  <Button
+                    type="button"
+                    variant={formData.priceType === 'fixed' ? 'default' : 'outline'}
+                    className="flex-1"
+                    onClick={() => setFormData({ ...formData, priceType: 'fixed' })}
+                    data-testid="price-type-fixed-button"
+                  >
+                    Harga Tetap
+                  </Button>
+                  <Button
+                    type="button"
+                    variant={formData.priceType === 'variable' ? 'default' : 'outline'}
+                    className="flex-1"
+                    onClick={() => setFormData({ ...formData, priceType: 'variable' })}
+                    data-testid="price-type-variable-button"
+                  >
+                    Harga Variabel
+                  </Button>
+                </div>
               </div>
+
+              {formData.priceType === 'fixed' ? (
+                <div>
+                  <Label htmlFor="price">Harga</Label>
+                  <Input
+                    id="price"
+                    type="number"
+                    value={formData.price}
+                    onChange={(e) => setFormData({ ...formData, price: Number(e.target.value) })}
+                    required
+                    data-testid="service-price-input"
+                  />
+                </div>
+              ) : (
+                <div className="flex gap-3">
+                  <div className="flex-1">
+                    <Label htmlFor="minPrice">Harga Minimum</Label>
+                    <Input
+                      id="minPrice"
+                      type="number"
+                      value={formData.minPrice}
+                      onChange={(e) => setFormData({ ...formData, minPrice: Number(e.target.value) })}
+                      required
+                      data-testid="service-min-price-input"
+                    />
+                  </div>
+                  <div className="flex-1">
+                    <Label htmlFor="maxPrice">Harga Maksimum</Label>
+                    <Input
+                      id="maxPrice"
+                      type="number"
+                      value={formData.maxPrice}
+                      onChange={(e) => setFormData({ ...formData, maxPrice: Number(e.target.value) })}
+                      required
+                      data-testid="service-max-price-input"
+                    />
+                  </div>
+                </div>
+              )}
               <div>
                 <Label htmlFor="description">Deskripsi</Label>
                 <Textarea
@@ -216,7 +297,11 @@ const ServicesPage = () => {
                     <TableCell className="font-medium">{service.name}</TableCell>
                     <TableCell>{service.category}</TableCell>
                     <TableCell>{service.duration} menit</TableCell>
-                    <TableCell>{formatCurrency(service.price)}</TableCell>
+                    <TableCell>
+                      {service.price_type === 'variable'
+                        ? `${formatCurrency(service.min_price)} – ${formatCurrency(service.max_price)}`
+                        : formatCurrency(service.price)}
+                    </TableCell>
                     <TableCell className="text-right">
                       <Button
                         size="icon"

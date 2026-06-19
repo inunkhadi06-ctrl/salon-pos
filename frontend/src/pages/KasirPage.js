@@ -31,6 +31,8 @@ const KasirPage = () => {
   const [savingCustomer, setSavingCustomer] = useState(false);
   const [serviceSearch, setServiceSearch] = useState('');
   const [serviceFilter, setServiceFilter] = useState('Semua');
+  const [variableServiceModal, setVariableServiceModal] = useState(null);
+  const [variablePrice, setVariablePrice] = useState(0);
 
   useEffect(() => {
     fetchData();
@@ -60,8 +62,30 @@ const KasirPage = () => {
       toast.info('Layanan sudah ada di keranjang');
       return;
     }
+    if (service.price_type === 'variable') {
+      setVariablePrice(service.min_price || 0);
+      setVariableServiceModal(service);
+      return;
+    }
     setCart([...cart, { ...service, type: 'service', quantity: 1 }]);
     toast.success(`${service.name} ditambahkan`);
+  };
+
+  const confirmVariablePrice = () => {
+    if (!variableServiceModal) return;
+    if (!variablePrice || variablePrice <= 0) {
+      toast.error('Masukkan harga yang valid');
+      return;
+    }
+    setCart([...cart, { 
+      ...variableServiceModal, 
+      type: 'service', 
+      quantity: 1,
+      price: variablePrice
+    }]);
+    toast.success(`${variableServiceModal.name} ditambahkan`);
+    setVariableServiceModal(null);
+    setVariablePrice(0);
   };
 
   const addProductToCart = (product) => {
@@ -417,13 +441,21 @@ const KasirPage = () => {
             <button
               key={service.id}
               onClick={() => addServiceToCart(service)}
-              className="p-4 border border-border rounded-lg hover:bg-accent hover:border-primary transition text-left"
+              className="p-4 border border-border rounded-lg hover:bg-accent hover:border-primary transition text-left relative"
               data-testid={`service-item-${service.id}`}
             >
+              {service.price_type === 'variable' && (
+                <span className="absolute top-2 right-2 text-[10px] font-bold bg-primary/10 text-primary px-2 py-0.5 rounded-full">
+                  Variabel
+                </span>
+              )}
               <p className="font-medium">{service.name}</p>
               <p className="text-sm text-muted-foreground">{service.category}</p>
               <p className="text-sm font-semibold text-primary mt-2">
-                {formatCurrency(service.price)}
+                {service.price_type === 'variable'
+                  ? `${formatCurrency(service.min_price)} – ${formatCurrency(service.max_price)}`
+                  : formatCurrency(service.price)
+                }
               </p>
             </button>
           ))}
@@ -793,6 +825,61 @@ const KasirPage = () => {
         </Button>
         <Button variant="outline" onClick={() => setNewCustomerDialog(false)} className="flex-1">
           Batal
+        </Button>
+      </div>
+    </div>
+  </DialogContent>
+</Dialog>
+
+          {/* Modal Harga Variabel */}
+<Dialog open={!!variableServiceModal} onOpenChange={(open) => !open && setVariableServiceModal(null)}>
+  <DialogContent className="max-w-sm">
+    <DialogHeader>
+      <DialogTitle>{variableServiceModal?.name}</DialogTitle>
+    </DialogHeader>
+    <div className="space-y-4">
+      <p className="text-sm text-muted-foreground">
+        Layanan ini punya harga variabel. Masukkan harga untuk transaksi ini.
+      </p>
+      <div>
+        <Label>Harga (Rp)</Label>
+        <Input
+          type="number"
+          value={variablePrice}
+          onChange={(e) => setVariablePrice(Number(e.target.value) || 0)}
+          autoFocus
+        />
+      </div>
+      {variableServiceModal?.min_price && variableServiceModal?.max_price && (
+        <div className="flex gap-2 flex-wrap">
+          {[variableServiceModal.min_price,
+            Math.round((variableServiceModal.min_price + variableServiceModal.max_price) / 2),
+            variableServiceModal.max_price
+          ].map(p => (
+            <button
+              key={p}
+              type="button"
+              onClick={() => setVariablePrice(p)}
+              className="px-3 py-1.5 text-xs border border-border rounded-full hover:border-primary hover:text-primary transition"
+            >
+              {formatCurrency(p)}
+            </button>
+          ))}
+        </div>
+      )}
+      {variablePrice > 0 && variableServiceModal?.min_price && variableServiceModal?.max_price && (
+        variablePrice < variableServiceModal.min_price || variablePrice > variableServiceModal.max_price
+      ) && (
+        <p className="text-xs text-amber-600">
+          Harga di luar rentang biasa ({formatCurrency(variableServiceModal.min_price)} – {formatCurrency(variableServiceModal.max_price)}). Tetap bisa dilanjutkan.
+        </p>
+      )}
+      <div className="flex gap-2">
+        <Button variant="outline" className="flex-1" onClick={() => setVariableServiceModal(null)}>
+          Batal
+        </Button>
+        <Button className="flex-1" onClick={confirmVariablePrice}>
+          Tambah ke Keranjang
         </Button>
       </div>
     </div>
