@@ -33,6 +33,8 @@ const KasirPage = () => {
   const [serviceFilter, setServiceFilter] = useState('Semua');
   const [variableServiceModal, setVariableServiceModal] = useState(null);
   const [variablePrice, setVariablePrice] = useState(0);
+  const [customerSearch, setCustomerSearch] = useState('');
+  const [showCustomerDropdown, setShowCustomerDropdown] = useState(false);
 
   useEffect(() => {
     fetchData();
@@ -330,28 +332,58 @@ const KasirPage = () => {
                 Pelanggan <span className="text-destructive">*</span>
   </Label>
   <div className="flex gap-2">
-    <Select 
-      value={selectedCustomer?.id || ''} 
-      onValueChange={(value) => {
-        const customer = customers.find(c => c.id === value);
-        setSelectedCustomer(customer);
+  <div className="relative flex-1">
+    <Input
+      data-testid="customer-search"
+      placeholder={selectedCustomer ? selectedCustomer.name : "Cari nama pelanggan..."}
+      value={customerSearch}
+      onChange={(e) => {
+        setCustomerSearch(e.target.value);
+        setShowCustomerDropdown(true);
+        if (!e.target.value) setSelectedCustomer(null);
       }}
-    >
-      <SelectTrigger data-testid="customer-select">
-        <SelectValue placeholder="Pilih pelanggan..." />
-      </SelectTrigger>
-      <SelectContent>
-        {customers.map(customer => (
-          <SelectItem key={customer.id} value={customer.id}>
-            {customer.name} - {customer.phone}
-          </SelectItem>
-        ))}
-      </SelectContent>
-    </Select>
-    <Button variant="outline" size="icon" onClick={() => setNewCustomerDialog(true)}>
-      <Plus className="h-4 w-4" />
-    </Button>
+      onFocus={() => setShowCustomerDropdown(true)}
+      onBlur={() => setTimeout(() => setShowCustomerDropdown(false), 150)}
+      className={selectedCustomer ? 'border-primary' : ''}
+    />
+    {showCustomerDropdown && customerSearch && (
+      <div className="absolute z-50 w-full mt-1 bg-background border border-border rounded-lg shadow-md max-h-48 overflow-y-auto">
+        {customers
+          .filter(c =>
+            c.name.toLowerCase().includes(customerSearch.toLowerCase()) ||
+            c.phone.includes(customerSearch)
+          )
+          .length === 0 ? (
+          <p className="text-sm text-muted-foreground px-3 py-2">Pelanggan tidak ditemukan</p>
+        ) : (
+          customers
+            .filter(c =>
+              c.name.toLowerCase().includes(customerSearch.toLowerCase()) ||
+              c.phone.includes(customerSearch)
+            )
+            .map(customer => (
+              <button
+                key={customer.id}
+                type="button"
+                onMouseDown={() => {
+                  setSelectedCustomer(customer);
+                  setCustomerSearch('');
+                  setShowCustomerDropdown(false);
+                }}
+                className="w-full text-left px-3 py-2 text-sm hover:bg-accent flex flex-col"
+              >
+                <span className="font-medium">{customer.name}</span>
+                <span className="text-xs text-muted-foreground">{customer.phone}</span>
+              </button>
+            ))
+        )}
+      </div>
+    )}
   </div>
+  <Button variant="outline" size="icon" onClick={() => setNewCustomerDialog(true)}>
+    <Plus className="h-4 w-4" />
+  </Button>
+</div>
   {selectedCustomer && (
     <p className="text-xs text-muted-foreground mt-2">
       Poin: {selectedCustomer.loyalty_points} | Kunjungan: {selectedCustomer.visit_count}x
