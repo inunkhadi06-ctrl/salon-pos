@@ -439,7 +439,7 @@ const KasirPage = () => {
       data-testid="service-search"
     />
     <div className="flex gap-2">
-      {['Semua', ...new Set(services.map(s => s.category).filter(Boolean))].map(f => (
+      {['Semua', ...new Set(services.map(s => s.category?.trim()).filter(Boolean))].map(f => (
         <button
           key={f}
           onClick={() => setServiceFilter(f)}
@@ -457,7 +457,7 @@ const KasirPage = () => {
     {(() => {
       const filtered = services.filter(s => {
         const matchSearch = s.name.toLowerCase().includes(serviceSearch.toLowerCase());
-        const matchFilter = serviceFilter === 'Semua' || s.category?.toUpperCase() === serviceFilter.toUpperCase();
+        const matchFilter = serviceFilter === 'Semua' || s.category?.trim().toLowerCase() === serviceFilter.trim().toLowerCase();
         return matchSearch && matchFilter;
       });
 

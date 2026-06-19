@@ -47,8 +47,7 @@ const ServicesPage = () => {
   const fetchServices = async () => {
     try {
       const response = await api.getServices();
-      setServices(response.data);
-      setFilteredServices(response.data);
+      setServices(response.data);  // cukup set services aja, filter handle sendiri via useEffect
     } catch (error) {
       toast.error('Gagal memuat data layanan');
     }
