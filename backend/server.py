@@ -81,7 +81,10 @@ class Service(BaseModel):
     name: str
     category: str
     duration: int
-    price: float
+    price_type: str = "fixed"  # "fixed" | "variable"
+    price: float = 0
+    min_price: Optional[float] = None
+    max_price: Optional[float] = None
     description: Optional[str] = None
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
