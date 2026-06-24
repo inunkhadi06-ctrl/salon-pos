@@ -720,8 +720,8 @@ const KasirPage = () => {
           {lastTransaction && (
             <div className="print-area space-y-3 font-mono text-sm">
               <div className="text-center border-b border-dashed pb-3">
-                <h2 className="font-heading text-xl font-bold">MULYA SALON</h2>
-                <p className="text-xs text-muted-foreground">Sistem POS Salon & Barbershop</p>
+                <h2 className="font-heading text-xl font-bold">MULYA</h2>
+                <p className="text-xs text-muted-foreground">Salon & Barbershop</p>
               </div>
               
               <div className="space-y-1 text-xs border-b border-dashed pb-3">
