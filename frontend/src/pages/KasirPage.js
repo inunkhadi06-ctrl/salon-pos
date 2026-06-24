@@ -232,8 +232,8 @@ const KasirPage = () => {
   };
 
   // Header
-  cmds += center + boldOn + 'MULYA SALON\n' + boldOff;
-  cmds += 'Sistem POS Salon & Barbershop\n';
+  cmds += center + boldOn + 'MULYA\n' + boldOff;
+  cmds += 'Salon & Barbershop\n';
   cmds += left + line + '\n';
 
   // Info
