@@ -721,7 +721,7 @@ const KasirPage = () => {
             <div className="print-area space-y-3 font-mono text-sm">
               <div className="text-center border-b border-dashed pb-3">
                 <h2 className="font-heading text-xl font-bold">MULYA</h2>
-                <p className="text-xs text-muted-foreground">Salon & Barbershop</p>
+                <h2 className="font-heading text-xl font-bold">SALON & BARBERSHOP</h2>
               </div>
               
               <div className="space-y-1 text-xs border-b border-dashed pb-3">
